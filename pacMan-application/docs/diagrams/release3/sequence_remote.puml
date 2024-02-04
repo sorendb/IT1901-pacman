@@ -1,0 +1,23 @@
+@startuml Sequence Diagram
+actor       User        as Foo
+
+
+==game start==
+==game over==
+Foo -> RemotePacManController: : gameOver
+RemotePacManController -> URI: initializeURI()
+URI --> RemotePacManController: server
+RemotePacManController -> RemotePacManModelAccess: RemotePacManModelAccess(server)
+RemotePacManController -> RemotePacManModelAccess: putHighscore(username, score)
+RemotePacManModelAccess -> PacManUser: PacManUser(username, highscore)
+PacManUser --> RemotePacManModelAccess: pacManUser
+RemotePacManModelAccess -> Gson: Gson()
+RemotePacManModelAccess <-- Gson: gson
+RemotePacManModelAccess -> Gson: gson.toJson(pacManUser)
+Gson --> RemotePacManModelAccess: json
+RemotePacManModelAccess -> HttpRequest: newBuilder(server)
+RemotePacManModelAccess -> HttpRequest: PUT(BodyPublishers.ofString(json))
+HttpRequest <- RemotePacManModelAccess: request
+HttpRequest -> HttpClient: send request 
+
+@enduml
